@@ -7,9 +7,6 @@ const authRouter = require("./routes/authRouter");
 
 const app = express();
 
-// REMOVED: Session and Passport initialization (not needed for JWT)
-// app.use(session({ ... }));
-// app.use(passport.initialize());
 
 //app.use(cors({ origin: `http://localhost:${process.env.urlPORT || 3000}`, credentials: true })); // ADJUSTED: for frontend communication
 app.use(express.json()); // ADJUSTED: To handle JSON API requests instead of form-data only

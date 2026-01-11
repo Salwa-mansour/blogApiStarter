@@ -6,12 +6,13 @@
   "scripts": {
     "start": "node server",
     "dev": "nodemon server",
-     "prisma:generate": "prisma generate",
+    "postinstall": "prisma generate",
+    "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init"
   },
   "author": "salwa",
   "license": "ISC",
-   "type": "commonjs",
+  "type": "commonjs",
   "dependencies": {
     "@prisma/adapter-pg": "^7.0.1",
     "@prisma/client": "^7.0.1",
@@ -26,7 +27,8 @@
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
