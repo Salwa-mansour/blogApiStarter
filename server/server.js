@@ -1,6 +1,7 @@
 // Path: app.js
 
 const express = require("express");
+
 const cookieParser = require("cookie-parser"); // ADDED: To read refresh tokens from cookies
 const cors = require("cors"); // ADDED: To allow your frontend to talk to the API
 const authRouter = require("./routes/authRouter");

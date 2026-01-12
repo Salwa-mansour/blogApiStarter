@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
 const { v4: uuidv4 } = require("uuid");
-const prisma = new PrismaClient();
+const prisma = require("../data/prismaConnection");
 
 // MODIFIED: From rendering a page to returning JSON + HttpOnly Cookie
 exports.loginPost = async (req, res) => {
