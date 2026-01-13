@@ -5,6 +5,10 @@ const authRouter = express.Router();
 const authController = require('../controllers/authController');
 
 authRouter.post('/login', authController.loginPost);
+authRouter.post('/signup', authController.signupAccount);
+
+// Token refresh endpoint 
+
 
 authRouter.post('/refresh', async (req, res) => {
   const token = req.cookies.refreshToken;

@@ -14,10 +14,10 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  username String   @unique
-  password String
-
+  id        Int      @id @default(autoincrement())
+  userName  String
+  email     String   @unique
+  password  String
   // NEW: Link to the tokens table for session management
   refreshTokens RefreshToken[] 
 }
