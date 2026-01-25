@@ -17,7 +17,12 @@ async function findByEmail(email) {
     },
   });
 }
-
+async function findByUserName(userName) {
+  return prisma.user.findUnique({
+    where: {
+      userName: userName, 
+    },});
+}
 async function comparePassword(plain, hashed) {
   return bcrypt.compare(plain, hashed);
 }
@@ -42,12 +47,27 @@ async function rotateToken(oldJti, userId, newHashedToken){
     })
   ]);
 };
-
-
+async function  findToken(jti) {
+  return await prisma.refreshToken.findUnique({ where: { id: jti } });
+}
+async function deleteToken(jti){
+  return  await prisma.refreshToken.deleteMany({ where: { id: jti } });
+}
+async function updatedUser(userId,newRoles){ prisma.user.update({
+            where: { id: Number(userId) },
+            data: { roles: newRoles },
+            select: { id: true, username: true, roles: true }
+        });
+  
+}
 module.exports = {
   createUser,
   findByEmail,
+  findByUserName,
+  updatedUser,
   comparePassword,
   findUserById,
-  rotateToken
+  rotateToken,
+  deleteToken,
+  findToken
 }

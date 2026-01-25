@@ -15,20 +15,29 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  userName  String
+  userName  String   @unique 
   email     String   @unique
   password  String
   // NEW: Link to the tokens table for session management
   refreshTokens RefreshToken[] 
+  roles      Role[]     @default([USER])
 }
 
 // NEW MODEL: This keeps the database small by only storing active session IDs (jti)
 model RefreshToken {
-  id          String   @id @default(uuid()) // This is our 'jti'
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
+ id        String   @id @default(uuid()) // This is your 'jti'
+  hashedToken String? // Store a hash of the token for extra security
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
-  @@index([userId])
+  @@index([userId]) // Makes lookups fast
+}
+enum Role {
+  USER
+  ADMIN
+  EDITOR
 }
