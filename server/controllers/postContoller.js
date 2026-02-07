@@ -8,6 +8,12 @@ async function  getMyPosts(req,res){
     });
 }
 
+async function createPost(req,res) {
+    return res.status(201).json({
+        message:"post created !"
+    });
+}
 module.exports={
-    getMyPosts
+    getMyPosts,
+    createPost
 }

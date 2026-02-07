@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+require('dotenv').config();
+const prisma = require('../data/prismaClient');
+const bcrypt = require('bcryptjs');
 
 async function main() {
   const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'Admin123!'; 
@@ -14,8 +13,9 @@ async function main() {
     update: {}, 
     create: {
       userName: 'admin',
+      email: 'admin@example.com',
       password: hashedPassword,
-      roles: ['ADMIN'], // Ensure 'ADMIN' is in your enum
+       roles: ['ADMIN'], // Uncomment if your schema has a roles field
     },
   });
 
