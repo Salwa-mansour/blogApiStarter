@@ -6,15 +6,21 @@ const prisma = require('../data/prismaClient');
 const generateAndSendTokens = async (user, res) => {
   const jti = uuidv4();
 
-  // Generate Tokens
+  // Generate Tokens 
   const accessToken = jwt.sign(
-    { userId: user.id, jti },
+    { userId: user.id, 
+      jti ,
+      roles: user.roles
+    },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "15m" }
   );
 
   const refreshToken = jwt.sign(
-    { userId: user.id, jti },
+    { userId: user.id, 
+      jti ,
+      roles: user.roles
+    },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "7d" }
   );

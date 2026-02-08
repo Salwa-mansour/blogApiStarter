@@ -2,9 +2,10 @@ const express = require('express');
 const postRouter = express.Router();
 const postController = require('../controllers/postContoller');
 const auth = require('../middleware/authMiddleware');
-const ROLES_LIST = require('../config/roles_list.JS');
+const ROLES_LIST = require('../config/roles_list.js');
 const verifyRoles = require('../middleware/verifyRoles');
 
 postRouter.post('/myPosts',auth, postController.getMyPosts);
-postRouter.post('/publish', auth, verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor), postController.createPost);
+// postRouter.post('/publish', auth,  postController.createPost);
+postRouter.post('/publish', auth, verifyRoles(ROLES_LIST.ADMIN, ROLES_LIST.EDITOR), postController.createPost);
 module.exports = postRouter;

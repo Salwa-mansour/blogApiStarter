@@ -59,7 +59,7 @@ exports.loginPost = async (req, res) => {
     // REUSE: Generate tokens and set cookie
     const accessToken = await generateAndSendTokens(user, res);
 
-    res.json({ accessToken, user: { id: user.id, email: user.email } });
+    res.json({ accessToken, user: { id: user.id, email: user.email,roles:user.roles } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -10,7 +10,7 @@ async function createUser({ userName, email, password }) {
 }
 
 async function findByEmail(email) {
-  console.log(email);
+
   return prisma.user.findUnique({
     where: {
       email: email, 
