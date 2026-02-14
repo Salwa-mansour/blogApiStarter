@@ -5,6 +5,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser"); // ADDED: To read refresh tokens from cookies
 const cors = require("cors"); // ADDED: To allow your frontend to talk to the API
 const authRouter = require("./routes/authRouter");
+const categoryRouter = require("./routes/categoryRouter")
 const postRouter = require("./routes/postRouter");
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser()); // ADDED: Crucial for HttpOnly cookie security
 
 app.use("/", authRouter);
+app.use("/category",categoryRouter);
 app.use("/posts",postRouter );
 
  //------------------end of routes--------------

@@ -14,15 +14,17 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  userName  String   @unique 
-  email     String   @unique
-  password  String
-  // NEW: Link to the tokens table for session management
-  refreshTokens RefreshToken[] 
-  roles      Role[]     @default([USER])
+  id            Int            @id @default(autoincrement())
+  userName      String         @unique
+  email         String         @unique
+  password      String
+  roles         Role[]         @default([USER])
+  
+  // Relationships
+  refreshTokens RefreshToken[]
+  posts         Post[]         
+  comments      Comment[]      
 }
-
 // NEW MODEL: This keeps the database small by only storing active session IDs (jti)
 model RefreshToken {
  id        String   @id @default(uuid()) // This is your 'jti'
@@ -40,4 +42,41 @@ enum Role {
   USER
   ADMIN
   EDITOR
+}
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  posts       Post[]  // Implicit Many-to-Many relationship with Post
+}
+
+model Post {
+  id          Int        @id @default(autoincrement())
+  title       String
+  content     String
+  isPublished Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  
+  
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  categoryId Int
+  category   Category   @relation(fields: [categoryId],references: [id])
+
+  comments    Comment[]
+  
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  // Relationship to Post
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
+
+  // Relationship to User
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
 }

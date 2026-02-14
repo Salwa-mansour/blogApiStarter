@@ -5,7 +5,7 @@ const auth = require('../middleware/authMiddleware');
 const ROLES_LIST = require('../config/roles_list.js');
 const verifyRoles = require('../middleware/verifyRoles');
 
-postRouter.post('/myPosts',auth, postController.getMyPosts);
-// postRouter.post('/publish', auth,  postController.createPost);
+postRouter.get('/',auth, postController.getPosts);
+
 postRouter.post('/publish', auth, verifyRoles(ROLES_LIST.ADMIN, ROLES_LIST.EDITOR), postController.createPost);
 module.exports = postRouter;

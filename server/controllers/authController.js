@@ -8,7 +8,7 @@ const { generateAndSendTokens } = require("../utility/tokens");
 // POST /signup
 exports.signupAccount = async (req, res, next) => {
   const { userName, email, password ,confirmPassword} = req.body;
- // console.log(req.body)
+
   try {
     // 1. Check if user already exists
     const existingUser = await db.findByEmail(email);
