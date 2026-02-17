@@ -8,7 +8,19 @@ async function  getMyPosts(req,res){
       
     });
 }
-
+async function postData(req,res){
+    const postId = parseInt(req.params.id);
+    const post = await db.getPostById(postId);
+    if(!post){
+        return res.status(404).json({
+            message:"post not found"
+        });
+    }
+    return res.status(200).json({
+        message:"post data",
+        post
+    });
+}
 async function createPost(req,res) {
    
     const newPost={
