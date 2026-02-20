@@ -1,11 +1,13 @@
 
 const db = require("../data/postData");
+// const { post } = require("../routes/authRouter");
 
 async function  getMyPosts(req,res){
-
+    console.log(req.user)
+     const posts = await db.getUserPosts(req.user.id);
     return res.status(200).json({
       message: "all your posts",
-      
+       posts
     });
 }
 async function postData(req,res){
@@ -45,7 +47,27 @@ async function getPosts(req,res){
         posts       
     });
 }
+async function updatePost(req,res) { 
+    const postId = parseInt(req.params.id);
+    const newData = req.body;
+    const newPost = await db.postUpdate(postId,newData);
+    return res.status(201).json({
+        message:"post Updated",
+        post:newPost
+    })
+}
+async function  deletePost(req,res) {
+    const postId =parseInt(req.params.id);
+    const deletedPost = await db.postDelete(postId);
+    return res.status(200).json({
+        message:"post deleted"
+    })
+}
 module.exports={
+    getMyPosts,
+    postData,
     getPosts,
-    createPost
+    createPost,
+    updatePost,
+    deletePost
 }

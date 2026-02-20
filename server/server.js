@@ -7,6 +7,7 @@ const cors = require("cors"); // ADDED: To allow your frontend to talk to the AP
 const authRouter = require("./routes/authRouter");
 const categoryRouter = require("./routes/categoryRouter")
 const postRouter = require("./routes/postRouter");
+const commentRouter = require('./routes/commentRouter');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(cookieParser()); // ADDED: Crucial for HttpOnly cookie security
 app.use("/", authRouter);
 app.use("/category",categoryRouter);
 app.use("/posts",postRouter );
+app.use('comments',commentRouter);
 
  //------------------end of routes--------------
 app.use('/{*splat}', async (req, res) => {
