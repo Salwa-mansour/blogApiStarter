@@ -19,6 +19,7 @@ async function createComment(req,res) {
 }
 async function getPostComments(req,res){
     const postId = parseInt(req.params.postId);
+    console.log("postId in controller:", req.params); // Debugging log
     const comments = await db.getPostComments(postId);  
     return res.status(200).json({
         message:"Comments retrieved successfully !",
