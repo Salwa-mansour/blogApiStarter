@@ -27,7 +27,7 @@ async function getPostComments(req,res){
     });
 }
 async function commentData(req,res){
-    const commentId = parseInt(req.params.id);
+    const commentId = parseInt(req.params.commentId);
     const comment = await db.getCommentById(commentId);
     return res.status(200).json({
         message:"Comment retrieved successfully !",
@@ -35,7 +35,7 @@ async function commentData(req,res){
     });
 }
 async function updatecomment(req,res){
-    const commentId = parseInt(req.params.id);
+    const commentId = parseInt(req.params.commentId);
     const updatedData = {   
         content: req.body.content
     };
@@ -46,7 +46,7 @@ async function updatecomment(req,res){
     });
 }
 async function deletecomment(req,res){
-    const commentId = parseInt(req.params.id);
+    const commentId = parseInt(req.params.commentId);
     const deletedComment = await db.deleteComment(commentId);
     return res.status(200).json({
         message:"Comment deleted successfully !",

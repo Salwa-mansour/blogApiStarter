@@ -9,7 +9,7 @@ const canModify = require('../middleware/canModify');
 commentRouter.get('/', commentController.getPostComments);
 commentRouter.post('/add', auth, commentController.createComment);
 
-commentRouter.get('/:id',commentController.commentData);
-commentRouter.put('/:id', auth,canModify.authorizeComment, commentController.updatecomment);
-commentRouter.delete('/:id', auth,canModify.authorizeComment({ allowAdmin: true }), commentController.deletecomment);
+commentRouter.get('/:commentId',commentController.commentData);
+commentRouter.put('/:commentId', auth,canModify.authorizeComment(), commentController.updatecomment);
+commentRouter.delete('/:commentId', auth,canModify.authorizeComment({ allowAdmin: true }), commentController.deletecomment);
 module.exports = commentRouter; 
