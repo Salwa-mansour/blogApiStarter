@@ -1,17 +1,73 @@
+import axios from '../api/axios';
 import { useRef ,useState,useEffect} from "react";
 import {faCheck ,faTimes,faInfoCircle} from "@fortawesome/free-solid-svg-icons"
-import { faFontAwesome } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 
 const USER_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/ ;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}/ ;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}/ ;
+const REGISTER_URL = '/signup';
+
 
 const Register = () => {
-  const userRef = useRef();
+  const userNameRef = useRef();
   const errRef = useRef();
 
-  const [user, setUser] = useState('');
-  const [validName, setValidName] =useState(false);
-  const [userFocus, setUserFocus] = useState(false); 
+  const [userName, setUserName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [errMsg, setErrMsg] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [validMatch, setValidMatch] = useState(false);
+
+   useEffect(() => {
+    const match = password === confirmPassword;
+    setValidMatch(match);
+
+    // Only show the error if the user has actually started typing in the second box
+    if (confirmPassword && !match) {
+        setErrMsg("Passwords do not match");
+    } else {
+        // Clear the error if they match or if the confirm box is empty
+        setErrMsg(""); 
+    }
+}, [password, confirmPassword]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+        const response = await axios.post(REGISTER_URL, 
+            { userName, email, password, confirmPassword }, // No stringify needed
+            { withCredentials: true }
+        );
+
+        setSuccess(true);
+        // Clear inputs
+        setUserName('');
+        setPassword('');
+        setConfirmPassword('');
+        setErrMsg(''); // Clear any old errors
+
+    } catch (err) {
+        // 1. Check if the server even responded (Network Error)
+        if (!err?.response) {
+            setErrMsg('No Server Response');
+        } 
+        // 2. Display the specific error message sent by your backend
+        else if (err.response?.data?.error) {
+            setErrMsg(err.response.data.error); 
+        } 
+        // 3. Fallback for generic errors
+        else {
+            setErrMsg('Registration Failed');
+        }
+
+        // Use that useRef we talked about to focus the error message for accessibility
+        errRef.current.focus();
+    }
+}
 
     return (
           <>
@@ -34,17 +90,19 @@ const Register = () => {
                         <input
                             type="text"
                             id="username"
-                            ref={userRef}
+                            ref={userNameRef}
                             autoComplete="off"
-                            onChange={(e) => setUser(e.target.value)}
-                            value={user}
+                            onChange={(e) => setUserName(e.target.value)}
+                            value={userName}
                             required
-                            aria-invalid={validName ? "false" : "true"}
-                            aria-describedby="uidnote"
-                            onFocus={() => setUserFocus(true)}
-                            onBlur={() => setUserFocus(false)}
+                           
                         />
                       
+                        <label htmlFor="email">email</label>
+                        <input type="email"
+                        id="email" onChange={(e) => setEmail(e.target.value)}
+                        value={email} 
+                        required/>
 
                         <label htmlFor="password">
                             Password:
@@ -52,32 +110,26 @@ const Register = () => {
                         <input
                             type="password"
                             id="password"
-                            onChange={(e) => setPwd(e.target.value)}
-                            value={pwd}
+                            onChange={(e) =>{ setPassword(e.target.value); }}
+                            value={password}
                             required
-                            aria-invalid={validPwd ? "false" : "true"}
-                            aria-describedby="pwdnote"
-                            onFocus={() => setPwdFocus(true)}
-                            onBlur={() => setPwdFocus(false)}
+                           
                         />
                        
 
 
-                        <label htmlFor="confirm_pwd">
+                        <label htmlFor="confirmPassword">
                             Confirm Password:
                           
-                            <FontAwesomeIcon icon={faTimes}  />
+                            <FontAwesomeIcon icon="times" />
                         </label>
                         <input
                             type="password"
-                            id="confirm_pwd"
-                            onChange={(e) => setMatchPwd(e.target.value)}
-                            value={matchPwd}
+                            id="confirmPassword"
+                            onChange={(e) =>{ setConfirmPassword(e.target.value);}}
+                            value={confirmPassword}
                             required
-                            aria-invalid={validMatch ? "false" : "true"}
-                            aria-describedby="confirmnote"
-                            onFocus={() => setMatchFocus(true)}
-                            onBlur={() => setMatchFocus(false)}
+                         
                         />
                       
 
@@ -93,7 +145,7 @@ const Register = () => {
                 </section>
             )}
         </>
-    )
-}
+    );
+};
 
 export default Register
