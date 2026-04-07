@@ -13,6 +13,7 @@ const REGISTER_URL = '/signup';
 const Register = () => {
   const userNameRef = useRef();
   const errRef = useRef();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [userName, setUserName] = useState('');
   const [validName, setValidName] = useState(false);
@@ -34,6 +35,7 @@ const Register = () => {
   const [errMsg, setErrMsg] = useState('');
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => { userNameRef.current.focus(); }, [])
    useEffect(() => {
     const result = USER_REGEX.test(userName);
     setValidName(result);
@@ -56,6 +58,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowPwd(false);
+    setIsLoading(true);
     // final validation before sending to backend
      const v1 = USER_REGEX.test(userName);
      const v2 = EMAIL_REGEX.test(email);
@@ -64,11 +67,14 @@ const Register = () => {
             setErrMsg("Invalid Entry");
             return;
         }
+        const data = {
+            userName :userName.trim(),
+            email : email.trim(),
+            password : password.trim(),
+            confirmPassword :confirmPassword.trim()
+        }
     try {
-        const response = await axios.post(REGISTER_URL, 
-            { userName, email, password, confirmPassword }, // No stringify needed
-            { withCredentials: true }
-        );
+        const response = await axios.post(REGISTER_URL, data,  { withCredentials: true } );
 
         setSuccess(true);
         // Clear inputs
@@ -93,6 +99,8 @@ const Register = () => {
 
         // Use that useRef we talked about to focus the error message for accessibility
         errRef.current.focus();
+    }finally {
+    setIsLoading(false); // Stop loading regardless of success or error
     }
 }
 
@@ -227,8 +235,8 @@ const Register = () => {
                             Must match the first password input field.
                         </p>
 
-                        <button disabled={!validName || !validEmail || !validPassword || !validMatch ? true : false}>
-                        Sign Up
+                        <button disabled={!validName || !validEmail || !validPassword || !validMatch || isLoading ? true : false}>
+                            {isLoading ? "Signing Up..." : "Sign Up"}
                         </button>
                     </form>
                     <p>
