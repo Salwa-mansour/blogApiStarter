@@ -1,6 +1,6 @@
 import axios from '../api/axios';
 import { useRef ,useState,useEffect, use} from "react";
-import {faCheck ,faTimes,faInfoCircle} from "@fortawesome/free-solid-svg-icons"
+import {faCheck ,faTimes,faInfoCircle, faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 
 const USER_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/ ;
@@ -29,6 +29,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
 
   const [errMsg, setErrMsg] = useState('');
   const [success, setSuccess] = useState(false);
@@ -54,7 +55,15 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setShowPwd(false);
+    // final validation before sending to backend
+     const v1 = USER_REGEX.test(userName);
+     const v2 = EMAIL_REGEX.test(email);
+     const v3 = PASSWORD_REGEX.test(password);
+        if (!v1 || !v2 || !v3) {
+            setErrMsg("Invalid Entry");
+            return;
+        }
     try {
         const response = await axios.post(REGISTER_URL, 
             { userName, email, password, confirmPassword }, // No stringify needed
@@ -167,8 +176,9 @@ const Register = () => {
                         <FontAwesomeIcon icon={faCheck} className={validPassword ? "valid" : "hide"} />
                         <FontAwesomeIcon icon={faTimes} className={validPassword || !password ? "hide" : "invalid"} />
                     </label>
-                    <input
-                        type="password"
+                    <div className='input-box'>
+                        <input
+                        type={showPwd ? "text" : "password"}
                         id="password"
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
@@ -178,6 +188,16 @@ const Register = () => {
                         onFocus={() => setPasswordFocus(true)}
                         onBlur={() => setPasswordFocus(false)}
                     />
+                    <button 
+                    type="button" 
+                   onMouseDown={(e) => e.preventDefault()} // Stops the jump
+                    onClick={() => setShowPwd(prev => !prev)} // Handles the actual logic
+                    className="show-pwd-btn"
+                >
+                    <FontAwesomeIcon icon={showPwd ? faEyeSlash : faEye} />
+                </button>
+                    </div>
+                    
                     <p id="pwdnote" className={passwordFocus && !validPassword ? "instructions" : "offscreen"}>
                         <FontAwesomeIcon icon={faInfoCircle} />
                         8 to 24 characters.<br />

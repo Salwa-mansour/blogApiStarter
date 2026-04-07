@@ -17,7 +17,25 @@
 .instructions > svg {
     margin-right: 0.25rem;
 }
-
+.input-box{
+    position: relative;
+}
+.input-box input {
+    width: 100%;
+    
+}
+.show-pwd-btn {
+    position: absolute;
+    top: 50%;
+    inset-inline-end: 0;
+    transform: translateY(-50%);
+    margin: 0;
+    padding: .25rem .5rem;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+   
+  }
 .offscreen {
     position: absolute;
     left: -9999px;
