@@ -1,10 +1,12 @@
 import axios from '../api/axios';
-import { useRef ,useState,useEffect} from "react";
+import { useRef ,useState,useEffect, use} from "react";
 import {faCheck ,faTimes,faInfoCircle} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 
 const USER_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/ ;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}/ ;
+
 const REGISTER_URL = '/signup';
 
 
@@ -13,26 +15,42 @@ const Register = () => {
   const errRef = useRef();
 
   const [userName, setUserName] = useState('');
+  const [validName, setValidName] = useState(false);
+  const [userFocus, setUserFocus] = useState(false);
+
   const [email, setEmail] = useState('');
+  const [validEmail, setValidEmail] = useState(false);
+  const [emailFocus, setEmailFocus] = useState(false);
+
   const [password, setPassword] = useState('');
+  const [validPassword, setValidPassword] = useState(false);
+  const [passwordFocus, setPasswordFocus] = useState(false);
+
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [validMatch, setValidMatch] = useState(false);
+  const [matchFocus, setMatchFocus] = useState(false);
 
   const [errMsg, setErrMsg] = useState('');
   const [success, setSuccess] = useState(false);
-  const [validMatch, setValidMatch] = useState(false);
 
    useEffect(() => {
+    const result = USER_REGEX.test(userName);
+    setValidName(result);
+    }, [userName]);
+
+    useEffect(() => {
+        const result = EMAIL_REGEX.test(email);
+        setValidEmail(result);
+    }, [email]);
+
+   // Validates the first password against the Regex
+    useEffect(() => {
+    const result = PASSWORD_REGEX.test(password);
+    setValidPassword(result);
+    // Also re-check the match whenever the primary password changes
     const match = password === confirmPassword;
     setValidMatch(match);
-
-    // Only show the error if the user has actually started typing in the second box
-    if (confirmPassword && !match) {
-        setErrMsg("Passwords do not match");
-    } else {
-        // Clear the error if they match or if the confirm box is empty
-        setErrMsg(""); 
-    }
-}, [password, confirmPassword]);
+    }, [password, confirmPassword]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,57 +101,115 @@ const Register = () => {
                     <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
                     <h1>Register</h1>
                     <form onSubmit={handleSubmit}>
-                        <label htmlFor="username">
-                            Username:
-                        
-                        </label>
-                        <input
-                            type="text"
-                            id="username"
-                            ref={userNameRef}
-                            autoComplete="off"
-                            onChange={(e) => setUserName(e.target.value)}
-                            value={userName}
-                            required
-                           
-                        />
-                      
-                        <label htmlFor="email">email</label>
-                        <input type="email"
-                        id="email" onChange={(e) => setEmail(e.target.value)}
-                        value={email} 
-                        required/>
+                       <label htmlFor="username">
+                        Username:
+                        {/* Show a green check if valid, or a red X if invalid + something is typed */}
+                        <span className={validName ? "valid" : "hide"}>
+                            <FontAwesomeIcon icon={faCheck} />
+                        </span>
+                        <span className={validName || !userName ? "hide" : "invalid"}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </span>
+                    </label>
 
-                        <label htmlFor="password">
-                            Password:
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            onChange={(e) =>{ setPassword(e.target.value); }}
-                            value={password}
-                            required
-                           
-                        />
+                    <input
+                        type="text"
+                        id="username"
+                        ref={userNameRef}
+                        autoComplete="off"
+                        onChange={(e) => setUserName(e.target.value)}
+                        value={userName}
+                        required
+                        aria-invalid={validName ? "false" : "true"}
+                        aria-describedby="uidnote"
+                        onFocus={() => setUserFocus(true)}
+                        onBlur={() => setUserFocus(false)}
+                    />
+
+                    {/* The instructions box */}
+                    <p id="uidnote" className={userFocus && userName && !validName ? "instructions" : "offscreen"}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                        4 to 24 characters.<br />
+                        Must begin with a letter.<br />
+                        Letters, numbers, underscores, hyphens allowed.
+                    </p>
+                      
+                        <label htmlFor="email">
+                        Email:
+                        <span className={validEmail ? "valid" : "hide"}>
+                            <FontAwesomeIcon icon={faCheck} />
+                        </span>
+                        <span className={validEmail || !email ? "hide" : "invalid"}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </span>
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        onChange={(e) => setEmail(e.target.value)}
+                        value={email}
+                        required
+                        aria-invalid={validEmail ? "false" : "true"}
+                        aria-describedby="emailnote"
+                        onFocus={() => setEmailFocus(true)}
+                        onBlur={() => setEmailFocus(false)}
+                    />
+
+                    <p id="emailnote" className={emailFocus && email && !validEmail ? "instructions" : "offscreen"}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                        Please enter a valid email address.<br />
+                        Example: name@directory.com
+                    </p>
+
+                       <label htmlFor="password">
+                        Password:
+                        <FontAwesomeIcon icon={faCheck} className={validPassword ? "valid" : "hide"} />
+                        <FontAwesomeIcon icon={faTimes} className={validPassword || !password ? "hide" : "invalid"} />
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        required
+                        aria-invalid={validPassword ? "false" : "true"}
+                        aria-describedby="pwdnote"
+                        onFocus={() => setPasswordFocus(true)}
+                        onBlur={() => setPasswordFocus(false)}
+                    />
+                    <p id="pwdnote" className={passwordFocus && !validPassword ? "instructions" : "offscreen"}>
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                        8 to 24 characters.<br />
+                        Must include uppercase and lowercase letters, a number and a special character.<br />
+                        Allowed special characters: <span aria-label="exclamation mark">!</span> <span aria-label="at symbol">@</span> <span aria-label="hashtag">#</span> <span aria-label="dollar sign">$</span> <span aria-label="percent">%</span>
+                    </p>
                        
 
-
-                        <label htmlFor="confirmPassword">
+                      <label htmlFor="confirmPassword">
                             Confirm Password:
-                          
-                            <FontAwesomeIcon icon="times" />
+                            <FontAwesomeIcon icon={faCheck} className={validMatch && confirmPassword ? "valid" : "hide"} />
+                            <FontAwesomeIcon icon={faTimes} className={validMatch || !confirmPassword ? "hide" : "invalid"} />
                         </label>
                         <input
                             type="password"
                             id="confirmPassword"
-                            onChange={(e) =>{ setConfirmPassword(e.target.value);}}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             value={confirmPassword}
                             required
-                         
+                            aria-invalid={validMatch ? "false" : "true"}
+                            aria-describedby="confirmnote"
+                            onFocus={() => setMatchFocus(true)}
+                            onBlur={() => setMatchFocus(false)}
                         />
-                      
+                        <p id="confirmnote" className={matchFocus && !validMatch ? "instructions" : "offscreen"}>
+                            <FontAwesomeIcon icon={faInfoCircle} />
+                            Must match the first password input field.
+                        </p>
 
-                        <button >Sign Up</button>
+                        <button disabled={!validName || !validEmail || !validPassword || !validMatch ? true : false}>
+                        Sign Up
+                        </button>
                     </form>
                     <p>
                         Already registered?<br />
