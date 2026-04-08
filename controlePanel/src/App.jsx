@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import './styles/App.css'
 import Register from './componunts/Register';
-
+import Login from './componunts/login';
 function App() {
  
   return (
-    <>
-   
-      <Register />
-    </>
+    <main className="App">
+      <Login />
+    </main>
   )
 }
 
