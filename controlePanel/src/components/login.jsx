@@ -1,5 +1,6 @@
-import { useState,useRef,useEffect, useContext } from "react";
-import AuthContext from "../context/AuthProvider";
+import { useState,useRef,useEffect} from "react";
+import {useAuth} from "../hooks/useAuth";
+import {Link , useNavigate , useLocation } from 'react-router';
 
 import axios from "../api/axios";
 const LOGIN_URL = '/login';
@@ -8,17 +9,22 @@ import { faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 
 const login = () => {
+    const { setAuth } = useAuth();
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
+
     const emailRef = useRef();
     const errRef = useRef();
-    const { setAuth } = useContext(AuthContext);
+    
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errMsg, setErrMsg] = useState('');
-  const [success, setSuccess] = useState(false);
-
+ 
   useEffect(() => {
     emailRef.current.focus();
   }, []);
@@ -37,12 +43,12 @@ const login = () => {
                 withCredentials: true
             }
         );
-        console.log(JSON.stringify(response?.data));
+        // console.log(JSON.stringify(response?.data));
         const accessToken = response?.data?.accessToken;    
-        setAuth({ email, password, accessToken });
+        setAuth({ email, password, accessToken , roles: response?.data?.auth?.roles });
         setEmail('');
         setPassword('');
-        setSuccess(true);
+        navigate(from, { replace: true });
     } catch (err) {
         if (!err?.response) {
             setErrMsg('No Server Response');
@@ -60,11 +66,7 @@ const login = () => {
   };
 
   return (
-    <> {success ? (
-        <section>
-            <h1>You are logged in!</h1>
-        </section>
-    ) : (
+    
         <section>
             <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
             <h1>Login</h1>
@@ -103,7 +105,7 @@ const login = () => {
         </form>
         <p>Need an account? <a href="/register">Register</a></p>
     </section>
-    )}</>
+   
   )
 }
 
