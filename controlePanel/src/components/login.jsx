@@ -45,7 +45,7 @@ const login = () => {
         );
         // console.log(JSON.stringify(response?.data));
         const accessToken = response?.data?.accessToken;    
-        setAuth({ email, password, accessToken , roles: response?.data?.auth?.roles });
+        setAuth({ email, accessToken , roles: response?.data?.auth?.roles });
         setEmail('');
         setPassword('');
         navigate(from, { replace: true });
