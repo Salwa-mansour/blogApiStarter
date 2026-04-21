@@ -8,9 +8,11 @@ const useAxiosPrivate = () => {
     const { auth } = useAuth();
 
         useEffect(() => {   
+            
             // the fiest time request or refresh page request >> no token yet
             const requestIntercept = axiosPrivate.interceptors.request.use(
                 config =>{
+                    console.log(config.headers['Authorization']);
                     if(!config.headers['Authorization']){
                         config.headers['Authorization'] = `Bearer ${auth?.accessToken}`;
                     }
@@ -18,19 +20,31 @@ const useAxiosPrivate = () => {
                 }, (error) => Promise.reject(error)
             )
 
-            const responseIntercept = axiosPrivate.interceptors.response.use(
-                response =>response ,
-                async (error) =>{
-                    const prevRequest = error?.config;
-                    if (error?.response?.status === 403 || error?.response?.status === 401 && !prevRequest?.sent ){
-                        prevRequest.sent = true;
-                        const newAccessToken = await refresh();
-                        prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                        return axiosPrivate(prevRequest);
-                    }
-                    return Promise.reject(error);
+           const responseIntercept = axiosPrivate.interceptors.response.use(
+        response => response,
+        async (error) => {
+            const prevRequest = error?.config;
+            
+            // Fix parentheses here!
+            if ((error?.response?.status === 403 || error?.response?.status === 401) && !prevRequest?.sent) {
+                prevRequest.sent = true;
+                
+                try {
+                    const newAccessToken = await refresh();
+                    
+                    // Ensure we override the header for the retry
+                    const authHeader = `Bearer ${newAccessToken}`;
+                    prevRequest.headers['Authorization'] = authHeader;
+                    
+                    // Use the original axiosPrivate instance to retry the request
+                    return axiosPrivate(prevRequest);
+                } catch (refreshError) {
+                    return Promise.reject(refreshError);
                 }
-            );
+            }
+            return Promise.reject(error);
+        }
+    );
 
             return ()=>{
                 axiosPrivate.interceptors.request.eject(requestIntercept);
