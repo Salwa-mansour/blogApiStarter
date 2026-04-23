@@ -12,7 +12,7 @@ import Unauthorized from './components/Unauthorized';
 import Lounge from './components/Lounge';
 import LinkPage from './components/LinkPage';
 import RequireAuth from './components/RequireAuth';
-import PresistLogin from './components/PersistLogin';
+import PersistLogin from './components/PersistLogin';
 import { Routes, Route } from 'react-router';
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
         <Route path="unauthorized" element={<Unauthorized />} />
 
 
-        {/* <Route element={<PresistLogin />} > */}
+        <Route element={<PersistLogin />} >
               <Route element={<RequireAuth allowedRoles={["ADMIN", "EDITOR", "USER"]} />}  >
                     <Route index element={<Home />} />
                 </Route>
@@ -41,7 +41,7 @@ function App() {
                 <Route element={<RequireAuth allowedRoles={["ADMIN", "EDITOR"]} />}  >
                     <Route path="lounge" element={<Lounge />} />
               </Route>
-        {/* </Route>   */}
+        </Route>  
         <Route path="*" element={<Missing />} />
       </Route>
     </Routes>

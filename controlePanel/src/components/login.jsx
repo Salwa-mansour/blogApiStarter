@@ -10,7 +10,7 @@ import { faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 
 const login = () => {
-    const { setAuth } = useAuth();
+    const { setAuth ,persist,setpersist } = useAuth();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -65,6 +65,12 @@ const login = () => {
     setIsLoading(false); // Stop loading regardless of success or error
     }
   };
+ const togglePersist = () => {
+    setpersist(prev => !prev);
+ }
+ useEffect(() => {
+    localStorage.setItem("persist", JSON.stringify(persist));
+}, [persist]);
 
   return (
     
@@ -103,6 +109,14 @@ const login = () => {
             <button type="submit" disabled={isLoading}>
                 {isLoading ? "Logging in..." : "Login"}
             </button>
+            <div className="persistCheck" >
+                    <input
+                     type="checkbox"
+                     id="persist"
+                     onChange={togglePersist} 
+                     checked={persist} />
+                     <label htmlFor="persist">trust this devise</label>
+            </div>
         </form>
         <p>Need an account? <a href="/register">Register</a></p>
     </section>
