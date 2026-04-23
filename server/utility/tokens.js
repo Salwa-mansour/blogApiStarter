@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require("uuid");
 const prisma = require('../data/prismaClient');
 
+
 const generateAndSendTokens = async (user, res) => {
   const jti = uuidv4();
 
@@ -10,19 +11,19 @@ const generateAndSendTokens = async (user, res) => {
   const accessToken = jwt.sign(
     { userId: user.id, 
       jti ,
-      roles: user.roles
+      userRoles: user.roles,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "15s" }
   );
 
   const refreshToken = jwt.sign(
     { userId: user.id, 
       jti ,
-      roles: user.roles
+      userRoles: user.roles
     },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: "15m" }
   );
 
   // Save JTI to DB
@@ -30,7 +31,8 @@ const generateAndSendTokens = async (user, res) => {
     data: {
       id: jti,
       userId: user.id,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+     
+      expiresAt: new Date(Date.now() +  24 * 60 * 60 * 1000),
     },
   });
 
@@ -39,7 +41,7 @@ const generateAndSendTokens = async (user, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge:  24 * 60 * 60 * 1000,
   });
 
   return accessToken;

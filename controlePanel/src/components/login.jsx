@@ -4,13 +4,15 @@ import {Link , useNavigate , useLocation } from 'react-router';
 
 import axios from "../api/axios";
 import getAuthDataFromToken from "../utils/jwtUtils";
+import useInput from "../hooks/useInput";
+import useToggle from "../hooks/useToggle";
 const LOGIN_URL = '/login';
 
 import { faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 
 const login = () => {
-    const { setAuth ,persist,setpersist } = useAuth();
+    const { setAuth  } = useAuth();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,9 +24,10 @@ const login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-  const [email, setEmail] = useState('');
+  const [email, resetEmail , emailAttribs] = useInput('email','');// useState
   const [password, setPassword] = useState('');
   const [errMsg, setErrMsg] = useState('');
+  const [persist, setPersist] = useToggle('persist',false);
  
   useEffect(() => {
     emailRef.current.focus();
@@ -47,7 +50,8 @@ const login = () => {
         // console.log(JSON.stringify(response?.data));
        const authData = getAuthDataFromToken(response?.data?.accessToken);
         setAuth({email,...authData});
-        setEmail('');
+       // setEmail('');
+       resetEmail('');
         setPassword('');
         navigate(from, { replace: true });
     } catch (err) {
@@ -65,12 +69,12 @@ const login = () => {
     setIsLoading(false); // Stop loading regardless of success or error
     }
   };
- const togglePersist = () => {
-    setpersist(prev => !prev);
- }
- useEffect(() => {
-    localStorage.setItem("persist", JSON.stringify(persist));
-}, [persist]);
+//  const togglePersist = () => {
+//     setpersist(prev => !prev);
+//  }
+//  useEffect(() => {
+//     localStorage.setItem("persist", JSON.stringify(persist));
+// }, [persist]);
 
   return (
     
@@ -84,8 +88,7 @@ const login = () => {
                 id="email"
                 ref={emailRef}
                 autoComplete="off"  
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
+                {...emailAttribs}
                 required  
             />
             <label htmlFor="password">Password:</label>
@@ -113,7 +116,7 @@ const login = () => {
                     <input
                      type="checkbox"
                      id="persist"
-                     onChange={togglePersist} 
+                     onChange={setPersist} 
                      checked={persist} />
                      <label htmlFor="persist">trust this devise</label>
             </div>

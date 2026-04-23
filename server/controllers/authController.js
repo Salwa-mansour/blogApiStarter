@@ -4,6 +4,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const { generateAndSendTokens } = require("../utility/tokens");
+const ROLES_LIST = require('../config/roles_list.JS');
+const { user } = require("../data/prismaClient");
+
 
 // POST /signup
 exports.signupAccount = async (req, res, next) => {
@@ -14,18 +17,18 @@ exports.signupAccount = async (req, res, next) => {
     const existingUser = await db.findByEmail(email);
     const existingUserName = await db.findByUserName(userName);
     if (existingUserName) {
-        return res.status(400).json({ 
+        return res.status(409).json({ 
           error: 'Username is already taken' 
         });
     }
      
     if (existingUser) {
-      return res.status(400).json({ 
+      return res.status(409).json({ 
         error: 'Email is already registered' 
       });
     }
     if (password !== confirmPassword) {
-      return res.status(400).json({ 
+      return res.status(422).json({ 
         error: 'Passwords do not match' 
       });
     }
@@ -49,7 +52,9 @@ exports.signupAccount = async (req, res, next) => {
 
 exports.loginPost = async (req, res) => {
   const { email, password } = req.body;
-
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
   try {
     const user = await db.findByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -59,7 +64,14 @@ exports.loginPost = async (req, res) => {
     // REUSE: Generate tokens and set cookie
     const accessToken = await generateAndSendTokens(user, res);
 
-    res.json({ accessToken, user: { id: user.id, email: user.email,roles:user.roles } });
+    res.json({ accessToken,
+       auth: { 
+            id: user.id,
+            email: user.email,
+            userRoles:user.roles
+         //   roles:Object.keys(ROLES_LIST)
+         } 
+      });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -77,36 +89,65 @@ exports.logout = async (req, res) => {
   res.clearCookie('refreshToken');
   res.status(200).json({ message: "Logged out" });
 };
-
- exports.refreshToken = async (req, res) => {
-  const token = req.cookies.refreshToken; // Read the HttpOnly cookie
-  if (!token) return res.sendStatus(401);
-
+exports.getAllUsers = async (req, res) => {
   try {
-    // 1. Verify the refresh token signature
-    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-
-    // 2. Check if the 'jti' (token ID) still exists in our Postgres DB
-    const dbToken =await db.findToken(decoded.jti);
-
-    if (!dbToken) {
-      // If the JTI is missing, the session was revoked or is a replay attack
-      return res.status(403).json({ message: "Session expired or revoked" });
-    }
-
-    // 3. Issue a new Access Token
-    const newToken = jwt.sign(
-      { userId: decoded.userId, jti: decoded.jti }, 
-      process.env.ACCESS_TOKEN_SECRET, 
-      { expiresIn: "15m" }
-    );
-
-    await db.rotateToken(decoded.jti, decoded.userId, newToken);
-   
-    res.json({ accessToken:newToken });
+    const users = await db.allUsers();
+    res.json(users);
   } catch (err) {
-    res.sendStatus(403);
+    console.error("Error fetching users:", err);
+    res.status(500).json({ error: err.message });
   }
+
+};
+
+exports.refreshToken = async (req, res) => {
+    // 1. Get the token from the cookie
+    const token = req.cookies?.refreshToken;
+    if (!token) return res.sendStatus(401);
+
+    try {
+        // 2. Verify the Refresh Token
+        const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+
+        // 3. Perform the Rotation in the Database
+        // We send the old ID to delete it and create a new one
+        const newTokenRecord = await db.rotateToken(decoded.jti, decoded.userId);
+
+        if (!newTokenRecord) {
+            return res.status(403).json({ message: "Invalid session" });
+        }
+
+        // 4. Generate NEW tokens using the NEW ID (jti) from the DB
+        const newJti = newTokenRecord.id;
+
+        const accessToken = jwt.sign(
+            { userId: decoded.userId, jti: newJti, userRoles: decoded.userRoles },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '15s' } // Standard time
+        );
+
+        const newRefreshToken = jwt.sign(
+            { userId: decoded.userId, jti: newJti,userRoles: decoded.userRoles },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '15m' }
+        );
+
+        // 5. Send the NEW cookie back to the browser
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: true, // true in production
+            sameSite: 'None',
+            maxAge:  24 * 60 * 60 * 1000 // 1 day
+        });
+
+        // 6. Return the Access Token to the React frontend
+        return res.json({ accessToken });
+
+    } catch (err) {
+        console.error("Refresh Error:", err.message);
+        // If rotation fails or token is expired
+        return res.sendStatus(403);
+    }
 };
 exports.updateUserRoles = async (req, res) => {
     // Both are now "hidden" in the JSON body

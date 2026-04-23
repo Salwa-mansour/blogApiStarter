@@ -12,7 +12,7 @@ const commentsRouter = require('./routes/commentsRouter');
 const app = express();
 
 
-//app.use(cors({ origin: `http://localhost:${process.env.urlPORT || 3000}`, credentials: true })); // ADJUSTED: for frontend communication
+app.use(cors({ origin: `http://localhost:${process.env.urlPORT || 3000}`, credentials: true })); // ADJUSTED: for frontend communication
 app.use(express.json()); // ADJUSTED: To handle JSON API requests instead of form-data only
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser()); // ADDED: Crucial for HttpOnly cookie security
@@ -29,7 +29,7 @@ app.use('/{*splat}', async (req, res) => {
       res.status("404").json( { message: `path ${req.originalUrl} not found ` } );
   });
  
- const PORT = process.env.urlPORT || 3000;
+ const PORT = process.env.PORT || 3000;
  app.listen(PORT, (error) => {
    if (error) {
      throw error;

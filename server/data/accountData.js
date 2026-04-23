@@ -8,7 +8,9 @@ async function createUser({ userName, email, password }) {
     data: { userName, email, password: hashedPassword },
   });
 }
-
+async function allUsers() {
+  return prisma.user.findMany();
+}
 async function findByEmail(email) {
 
   return prisma.user.findUnique({
@@ -30,23 +32,30 @@ async function comparePassword(plain, hashed) {
 async function findUserById(id) {
   return prisma.user.findUnique({ where: { id: Number(id) } });
 }
-// Inside your /refresh route logic
-async function rotateToken(oldJti, userId, newHashedToken){
-  return await prisma.$transaction([
-    // 1. Delete the old token immediately
-    prisma.refreshToken.delete({
-      where: { id: oldJti }
-    }),
-    // 2. Create the new one
-    prisma.refreshToken.create({
-      data: {
-        userId: userId,
-        hashedToken: newHashedToken,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-      }
-    })
-  ]);
-};
+async function rotateToken(oldJti, userId) {
+    try {
+        // We use a transaction so if one fails, the whole thing cancels
+        const [deleted, created] = await prisma.$transaction([
+            // Delete the old used token
+            prisma.refreshToken.delete({
+                where: { id: oldJti }
+            }),
+            // Create the next valid token
+            prisma.refreshToken.create({
+                data: {
+                    userId: userId,
+                    expiresAt: new Date(Date.now() +  24 * 60 * 60 * 1000)
+                }
+            })
+        ]);
+        
+        return created; // This contains the new 'id'
+    } catch (error) {
+        // If deletion fails, it means the jti was already used (Security risk!)
+        console.error("Token rotation failed - possible replay attack");
+        return null;
+    }
+}
 async function  findToken(jti) {
   return await prisma.refreshToken.findUnique({ where: { id: jti } });
 }
@@ -62,6 +71,7 @@ async function updatedUser(userId,newRoles){ prisma.user.update({
 }
 module.exports = {
   createUser,
+  allUsers,
   findByEmail,
   findByUserName,
   updatedUser,
