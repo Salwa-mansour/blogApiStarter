@@ -3,6 +3,7 @@ import {useAuth} from "../hooks/useAuth";
 import {Link , useNavigate , useLocation } from 'react-router';
 
 import axios from "../api/axios";
+import getAuthDataFromToken from "../utils/jwtUtils";
 const LOGIN_URL = '/login';
 
 import { faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons"
@@ -44,8 +45,8 @@ const login = () => {
             }
         );
         // console.log(JSON.stringify(response?.data));
-        const accessToken = response?.data?.accessToken;    
-        setAuth({ email, accessToken , roles: response?.data?.auth?.roles });
+       const authData = getAuthDataFromToken(response?.data?.accessToken);
+        setAuth({email,...authData});
         setEmail('');
         setPassword('');
         navigate(from, { replace: true });

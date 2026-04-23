@@ -12,7 +12,7 @@ const useAxiosPrivate = () => {
             // the fiest time request or refresh page request >> no token yet
             const requestIntercept = axiosPrivate.interceptors.request.use(
                 config =>{
-                    console.log(config.headers['Authorization']);
+               
                     if(!config.headers['Authorization']){
                         config.headers['Authorization'] = `Bearer ${auth?.accessToken}`;
                     }
