@@ -1,7 +1,7 @@
 // Path: app.js
 
 const express = require("express");
-
+const serverless = require("serverless-http");
 const cookieParser = require("cookie-parser"); // ADDED: To read refresh tokens from cookies
 const cors = require("cors"); // ADDED: To allow your frontend to talk to the API
 const authRouter = require("./routes/authRouter");
@@ -36,3 +36,5 @@ app.use('/{*splat}', async (req, res) => {
    }
    console.log(`Express app listening on port ${PORT}!`);
  });
+
+ module.exports =serverless(app);

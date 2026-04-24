@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server",
     "dev": "nodemon server",
-    "postinstall": "prisma generate",
+    "build": "prisma generate",
+  "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init"
   },
@@ -26,6 +27,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
+    "serverless-http": "^4.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "uuid": "^13.0.0"

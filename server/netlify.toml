@@ -1,0 +1,12 @@
+[build]
+  command = "pnpm run build"
+  publish = "public" # This is for your frontend; if API-only, create an empty 'public' folder
+
+[functions]
+  directory = "netlify/functions"
+  node_bundle = true
+
+  [[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
