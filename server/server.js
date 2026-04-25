@@ -36,5 +36,5 @@ app.use('/{*splat}', async (req, res) => {
    }
    console.log(`Express app listening on port ${PORT}!`);
  });
-
+// production export
  module.exports =serverless(app);
