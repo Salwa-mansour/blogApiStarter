@@ -23,18 +23,15 @@ app.use("/posts",postRouter );
 app.use('/posts/:postId/comments',commentsRouter);
 
  //------------------end of routes--------------
-app.use('/{*splat}', async (req, res) => {
-    // *splat matches any path without the root path. If you need to match the root path as well /, you can use /{*splat}, wrapping the wildcard in braces.
-    //res.sendFile(path.join(__dirname,'views','404.html'))
-      res.status("404").json( { message: `path ${req.originalUrl} not found ` } );
-  });
- 
-//  const PORT = process.env.PORT || 3000;
-//  app.listen(PORT, (error) => {
-//    if (error) {
-//      throw error;
-//    }
-//    console.log(`Express app listening on port ${PORT}!`);
-//  });
-// production export
- module.exports =serverless(app);
+// Standard Express catch-all for 404s
+app.use((req, res) => {
+    res.status(404).json({ message: `Path ${req.originalUrl} not found` });
+});
+
+// The CRITICAL export for Netlify
+const handler = serverless(app);
+module.exports.handler = async (event, context) => {
+  // This wrapper ensures any background tasks or database 
+  // connections are handled properly before the function freezes
+  return await handler(event, context);
+};
