@@ -1,4 +1,4 @@
-const { PrismaClient } = require('../functions/generated/client');
+const { PrismaClient } = require('../netlify/functions/generated/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { Pool } = require('pg');
 
