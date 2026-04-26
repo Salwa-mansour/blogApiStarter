@@ -4,6 +4,11 @@ import './styles/index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthProvider';
 import { BrowserRouter, Routes, Route } from 'react-router';
+import { disableReactDevTools } from '@fvilers/disable-react-devtools';
+
+if (process.env.NODE_ENV === 'production') {
+  disableReactDevTools();
+}
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>

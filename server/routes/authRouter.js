@@ -3,7 +3,7 @@ const authRouter = express.Router();
 
 const authController = require('../controllers/authController');
 const auth = require('../middleware/authMiddleware');
-const ROLES_LIST = require('../config/roles_list.JS');
+const ROLES_LIST = require('../config/roles_list.js');
 const verifyRoles = require('../middleware/verifyRoles');
 
 authRouter.post('/login', authController.loginPost);

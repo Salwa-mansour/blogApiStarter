@@ -1,4 +1,4 @@
-const ROLES_LIST = require('../config/roles_list.JS');
+const ROLES_LIST = require('../config/roles_list.js');
 
 const verifyRoles = (...allowedRoles) => {
     return (req, res, next) => {

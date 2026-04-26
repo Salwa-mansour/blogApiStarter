@@ -10,3 +10,7 @@
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
+
+  [functions.api] # Replace 'api' with your function filename if different
+  external_node_modules = ["@prisma/client"]
+  included_files = ["node_modules/.prisma/client/*.node"]

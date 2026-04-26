@@ -15,8 +15,10 @@ const Users = ()=> {
                 const response = await axiosPrivate.get('/users', {
                     signal: controller.signal
                 });
-              console.log(response.data);
-                isMounted && setUsers(response.data);
+                const userNames = response.data.map(user=> user.userName);
+              
+                isMounted && setUsers(userNames);
+                
             } catch (err) {
                 console.error(err);
                 // 1. Check if it's a cancellation error >> aport controller.abort() or component unmounts  
@@ -48,12 +50,8 @@ const Users = ()=> {
             <ul>
                 {users.map((user, i) => (
                     <li key={i}>
-                       <span>{user.userName}</span> 
-                       {/* <span>{
-                        user.roles?.map((role, index) => (
-                            <span key={index}>{role}</span>
-                        ))
-                        }</span> */}
+                       <span>{user}</span> 
+                    
                    </li>
                 ))}
             </ul>

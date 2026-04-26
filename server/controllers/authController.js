@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const { generateAndSendTokens } = require("../utility/tokens");
-const ROLES_LIST = require('../config/roles_list.JS');
+const ROLES_LIST = require('../config/roles_list.js');
 const { user } = require("../data/prismaClient");
 
 
