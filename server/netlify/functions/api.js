@@ -8,8 +8,8 @@ const authRouter = require("../../routes/authRouter");
 const categoryRouter = require("../../routes/categoryRouter")
 const postRouter = require("../../routes/postRouter");
 const commentsRouter = require('../../routes/commentsRouter');
-
-const router = express();
+const app = express(); // 1. Create the main app instance
+const router = express.Router(); // 2. Create a router instance
 
 
 router.use(cors({ origin: `http://localhost:${process.env.urlPORT || 3000}`, credentials: true })); // ADJUSTED: for frontend communication
