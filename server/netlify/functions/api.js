@@ -29,7 +29,7 @@ router.use((req, res) => {
 });
 
 // Tell Express to use this router for the Netlify function path
-app.use("/.netlify/functions/api", router);
+app.use("/api", router);
 // The CRITICAL export for Netlify
 const handler = serverless(app);
 module.exports.handler = async (event, context) => {
