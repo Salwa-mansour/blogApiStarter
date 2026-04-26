@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../netlify/functions/generated/client"
+  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  userName String @unique
+  email    String @unique
+  password String
+  roles    Role[] @default([USER])
+
+  // Relationships
+  refreshTokens RefreshToken[]
+  posts         Post[]
+  comments      Comment[]
+}
+
+// NEW MODEL: This keeps the database small by only storing active session IDs (jti)
+model RefreshToken {
+  id          String  @id @default(uuid()) // This is your 'jti'
+  hashedToken String? // Store a hash of the token for extra security
+  userId      Int
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId]) // Makes lookups fast
+}
+
+enum Role {
+  USER
+  ADMIN
+  EDITOR
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  posts       Post[] // Implicit Many-to-Many relationship with Post
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  comments Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  // Relationship to Post
+  postId Int
+  post   Post @relation(fields: [postId], references: [id])
+
+  // Relationship to User
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
