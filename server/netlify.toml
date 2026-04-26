@@ -13,6 +13,11 @@
 
   [functions.api] # Replace 'api' with your function filename if different
   # This tells the bundler NOT to try to optimize these
-  external_node_modules = ["@prisma/adapter-pg", "pg"]
+  external_node_modules = []
   # This ensures the engine files actually get moved to the server
-  included_files = ["node_modules/.prisma/client/**"]
+
+  included_files = [
+    "netlify/functions/generated/client/**",
+    "node_modules/@prisma/adapter-pg/**",
+    "node_modules/pg/**"
+  ]
