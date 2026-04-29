@@ -69,12 +69,6 @@ const login = () => {
     setIsLoading(false); // Stop loading regardless of success or error
     }
   };
-//  const togglePersist = () => {
-//     setpersist(prev => !prev);
-//  }
-//  useEffect(() => {
-//     localStorage.setItem("persist", JSON.stringify(persist));
-// }, [persist]);
 
   return (
     
