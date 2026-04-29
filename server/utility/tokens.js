@@ -14,7 +14,7 @@ const generateAndSendTokens = async (user, res) => {
       userRoles: user.roles,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15s" }
+    { expiresIn: "15m" }
   );
 
   const refreshToken = jwt.sign(
@@ -23,7 +23,7 @@ const generateAndSendTokens = async (user, res) => {
       userRoles: user.roles
     },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "1d" }
   );
 
   // Save JTI to DB

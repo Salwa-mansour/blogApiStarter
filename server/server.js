@@ -22,6 +22,15 @@ app.use("/category",categoryRouter);
 app.use("/posts",postRouter );
 app.use('/posts/:postId/comments',commentsRouter);
 
+// The Global Error Middleware
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+        status: 'error',
+        message: err.message || 'Internal Server Error'
+    });
+});
+
  //------------------end of routes--------------
 app.use('/{*splat}', async (req, res) => {
     // *splat matches any path without the root path. If you need to match the root path as well /, you can use /{*splat}, wrapping the wildcard in braces.

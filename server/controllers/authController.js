@@ -123,13 +123,13 @@ exports.refreshToken = async (req, res) => {
         const accessToken = jwt.sign(
             { userId: decoded.userId, jti: newJti, userRoles: decoded.userRoles },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '15s' } // Standard time
+            { expiresIn: '15m' } // Standard time
         );
 
         const newRefreshToken = jwt.sign(
             { userId: decoded.userId, jti: newJti,userRoles: decoded.userRoles },
             process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: '1d' }
         );
 
         // 5. Send the NEW cookie back to the browser
