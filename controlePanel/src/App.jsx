@@ -13,7 +13,11 @@ import Lounge from './components/Lounge';
 import LinkPage from './components/LinkPage';
 import RequireAuth from './components/RequireAuth';
 import PersistLogin from './components/PersistLogin';
+
 import { Routes, Route } from 'react-router';
+import Categories from './components/category/list';
+import CreateCategory from './components/category/create';
+import Posts from './components/post/list';
 
 function App() {
  
@@ -26,7 +30,9 @@ function App() {
         <Route path="linkpage" element={<LinkPage />} />
         <Route path="register" element={<Register />} />
         <Route path="unauthorized" element={<Unauthorized />} />
-
+        <Route path="categories" element={<Categories />} />
+        <Route path="posts" element={<Posts />} />
+      
 
         <Route element={<PersistLogin />} >
               <Route element={<RequireAuth allowedRoles={["ADMIN", "EDITOR", "USER"]} />}  >
@@ -37,6 +43,8 @@ function App() {
                 </Route>
                 <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}  >
                     <Route path="admin" element={<Admin />} />
+                    <Route path="createcategory" element={<CreateCategory />} />
+
                 </Route>
                 <Route element={<RequireAuth allowedRoles={["ADMIN", "EDITOR"]} />}  >
                     <Route path="lounge" element={<Lounge />} />

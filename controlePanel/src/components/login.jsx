@@ -24,10 +24,10 @@ const login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-  const [email, resetEmail , emailAttribs] = useInput('email','');// useState
-  const [password, setPassword] = useState('');
-  const [errMsg, setErrMsg] = useState('');
-  const [persist, setPersist] = useToggle('persist',false);
+    const [email, resetEmail , emailAttribs] = useInput('email','');// useState
+    const [password, setPassword] = useState('');
+    const [errMsg, setErrMsg] = useState('');
+    const [persist, setPersist] = useToggle('persist',false);
  
   useEffect(() => {
     emailRef.current.focus();

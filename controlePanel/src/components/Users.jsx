@@ -1,67 +1,43 @@
-import { useState ,useEffect} from "react";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import {useNavigate , useLocation} from "react-router";
-const Users = ()=> {
-    const [users,setUsers] = useState([]);
-    const axiosPrivate = useAxiosPrivate();
+
+import { useEffect } from 'react';
+import useFetchItems from '../hooks/fetchItems';
+import { useNavigate, useLocation } from 'react-router';    
+
+
+
+const Users = () => {
+    const [users, loading, error] = useFetchItems('/users');
     const navigate = useNavigate();
     const location = useLocation();
 
+
+    const userNames = users?.map(user => user.userName) || [];
+
     useEffect(() => {
-        let isMounted = true;
-        const controller = new AbortController();
-        const getUsers = async () => {
-            try {
-                const response = await axiosPrivate.get('/users', {
-                    signal: controller.signal
-                });
-              console.log(response.data);
-                isMounted && setUsers(response.data);
-            } catch (err) {
-                console.error(err);
-                // 1. Check if it's a cancellation error >> aport controller.abort() or component unmounts  
-                if (err.name === 'CanceledError' || err.name === 'AbortError') {
-                    console.log('Fetch aborted - no need to redirect');
-                    return; 
-                }
+        if (error) {
+            navigate('/login', { state: { from: location }, replace: true });
+        }
+    }, [error, navigate, location]);
 
-                // 2. Only navigate if it's a real error (like 401 or 403)
-                console.error(err);
-                navigate('/login', { state: { from: location }, replace: true });
-                     
-            }
-        };
-        getUsers();
-
-        return () => {
-            isMounted = false;
-            controller.abort();
-        };
-     },[]);
-
-  return (
-    <section>
-      <h2>Users</h2>
-     {
-        users.length 
-        ? (
-            <ul>
-                {users.map((user, i) => (
-                    <li key={i}>
-                       <span>{user.userName}</span> 
-                       {/* <span>{
-                        user.roles?.map((role, index) => (
-                            <span key={index}>{role}</span>
-                        ))
-                        }</span> */}
-                   </li>
-                ))}
-            </ul>
-        ): <p>No users to display</p>
-     }
    
-    </section>
-  )
+    if (loading) return <p>Loading users...</p>;
+
+     if (error) return <p>Error fetching users: {error}</p>;
+
+    return (
+        <section>
+            <h2>Users List</h2>
+            {userNames.length > 0 ? (
+                <ul>
+                    {userNames.map((name, i) => (
+                        <li key={i}><strong>{name}</strong></li>
+                    ))}
+                </ul>
+            ) : (
+                <p>No users found.</p>
+            )}
+        </section>
+    );
 }
 
-export default Users
+export default Users;
