@@ -4,10 +4,9 @@ export const getAuthDataFromToken = (token) => {
     try {
         if (!token) return null;
         const decodedToken = jwtDecode(token);
-        console.log(`decodedToken:${JSON.stringify(decodedToken)}`)
+        // console.log(`decodedToken:${JSON.stringify(decodedToken)}`)
         return {
-            email: decodedToken.email,
-            userRoles: decodedToken.userRoles || [],
+           ...decodedToken,
             accessToken: token
         };
     } catch (error) {

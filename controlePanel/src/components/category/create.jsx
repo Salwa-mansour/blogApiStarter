@@ -1,6 +1,6 @@
-import { useState,useEffect } from "react";
+import { useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate } from "react-router";
 
 
 
@@ -11,15 +11,16 @@ const CreateCategory = () => {
     const [creating, setCreating] = useState(false);
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate();
-    const location = useLocation();
-
 
 
    const handleSubmit = async (e) => {
             e.preventDefault();
             setCreating(true);
-            setError(null);
-    console.log({categoryName, categoryDesc})
+         if(!categoryName ){
+            setError("Category name is required");
+            setCreating(false);
+            return;         
+         }
             try {
               const response = await axiosPrivate.post('/category/create',{
                 categoryName,
@@ -48,6 +49,7 @@ const CreateCategory = () => {
                 <input
                     type="text"
                     id="categoryName"
+                    required
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
                     required

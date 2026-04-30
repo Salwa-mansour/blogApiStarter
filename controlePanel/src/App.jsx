@@ -18,6 +18,7 @@ import { Routes, Route } from 'react-router';
 import Categories from './components/category/list';
 import CreateCategory from './components/category/create';
 import Posts from './components/post/list';
+import CreatePost from './components/post/create';
 
 function App() {
  
@@ -44,7 +45,7 @@ function App() {
                 <Route element={<RequireAuth allowedRoles={["ADMIN"]} />}  >
                     <Route path="admin" element={<Admin />} />
                     <Route path="createcategory" element={<CreateCategory />} />
-
+                    <Route path="createpost" element={<CreatePost />} />
                 </Route>
                 <Route element={<RequireAuth allowedRoles={["ADMIN", "EDITOR"]} />}  >
                     <Route path="lounge" element={<Lounge />} />

@@ -17,10 +17,9 @@ const useRefreshToken = () => {
             console.log(JSON.stringify(prev));
             console.log(authData);
             return { ...prev,
-             
-                accessToken:authData.accessToken ,
-                userRoles:authData?.userRoles || []}
-        }   );
+                    ...authData,
+            };
+        });
         return authData.accessToken;
     };
 
