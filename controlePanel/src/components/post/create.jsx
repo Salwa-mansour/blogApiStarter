@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Navigate } from "react-router";
-import useFetchItems from "../../hooks/fetchItems";
+import useFetchItems from "../../hooks/useFetchItems";
 import { useNavigate } from "react-router";
 
 

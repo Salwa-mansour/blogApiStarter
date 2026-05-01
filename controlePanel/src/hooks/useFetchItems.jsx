@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAxiosPrivate from "./useAxiosPrivate";
 
 const useFetchItems = (reqData) => {
     const [items, setItems] = useState([]);
@@ -22,6 +22,7 @@ const useFetchItems = (reqData) => {
                 setError(null); // Clear previous errors on success
             } catch (error) {
                 if (error.name === 'CanceledError') {
+                    console.log(error.message);
                     console.log('Request canceled');
                 } else {
                     setError(error.message);

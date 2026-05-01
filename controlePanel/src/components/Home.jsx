@@ -1,11 +1,12 @@
 import { useNavigate, Link } from "react-router";
 import useLogout from "../hooks/useLogout";
+import { useAuth } from "../hooks/useAuth";
 const Home = () => {
-   
+    const { auth } = useAuth();
     const navigate = useNavigate();
     const logout = useLogout();
 
-
+console.log("Home component rendered, auth:", auth);
     const signOut = async () => {
         await logout();
         navigate('/linkpage');
@@ -15,15 +16,13 @@ const Home = () => {
         <section>
             <h1>Home</h1>
             <br />
-            <p>You are logged in!</p>
+            <p>wellcom {auth?.userName || 'Guest'}</p>
             <br />
-            <Link to="/editor">Go to the Editor page</Link>
+            <Link to="/posts">View Posts</Link>
+            <Link to="/categories">View Categories</Link>
+            <Link to="/users">View Users</Link>
             <br />
-            <Link to="/admin">Go to the Admin page</Link>
-            <br />
-            <Link to="/lounge">Go to the Lounge</Link>
-            <br />
-            <Link to="/linkpage">Go to the link page</Link>
+        
             <div className="flexGrow">
                 <button onClick={signOut}>Sign Out</button>
             </div>

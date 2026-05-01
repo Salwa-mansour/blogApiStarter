@@ -1,8 +1,8 @@
 
 import { useEffect } from 'react';
-import useFetchItems from '../hooks/fetchItems';
+import useFetchItems from '../hooks/useFetchItems';
 import { useNavigate, useLocation } from 'react-router';    
-
+import { Link } from 'react-router';
 
 
 const Users = () => {
@@ -26,7 +26,10 @@ const Users = () => {
 
     return (
         <section>
-            <h2>Users List</h2>
+            <h1>Admins Page</h1>
+            <br />
+         
+         
             {userNames.length > 0 ? (
                 <ul>
                     {userNames.map((name, i) => (
@@ -36,6 +39,9 @@ const Users = () => {
             ) : (
                 <p>No users found.</p>
             )}
+          <div className="flexGrow">
+                <Link to="/">Home</Link>
+            </div>
         </section>
     );
 }

@@ -52,7 +52,7 @@ const CreateCategory = () => {
                     required
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
-                    required
+                  
                 />
             </div>
             <div>

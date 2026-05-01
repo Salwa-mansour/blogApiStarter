@@ -19,6 +19,9 @@ import Categories from './components/category/list';
 import CreateCategory from './components/category/create';
 import Posts from './components/post/list';
 import CreatePost from './components/post/create';
+import Users from './components/Users';
+import EditCategory from './components/category/edit';
+import EditPost from './components/post/edit';
 
 function App() {
  
@@ -31,13 +34,14 @@ function App() {
         <Route path="linkpage" element={<LinkPage />} />
         <Route path="register" element={<Register />} />
         <Route path="unauthorized" element={<Unauthorized />} />
-        <Route path="categories" element={<Categories />} />
-        <Route path="posts" element={<Posts />} />
       
 
         <Route element={<PersistLogin />} >
               <Route element={<RequireAuth allowedRoles={["ADMIN", "EDITOR", "USER"]} />}  >
                     <Route index element={<Home />} />
+                    <Route path="categories" element={<Categories />} />
+                    <Route path="posts" element={<Posts />} />
+      
                 </Route>
                 <Route element={<RequireAuth allowedRoles={["EDITOR"]} />}  >
                   <Route path="editor" element={<Editor />} />
@@ -46,6 +50,9 @@ function App() {
                     <Route path="admin" element={<Admin />} />
                     <Route path="createcategory" element={<CreateCategory />} />
                     <Route path="createpost" element={<CreatePost />} />
+                    <Route path="users" element={<Users />} />
+                    <Route path="categories/:id/edit" element={<EditCategory />} />
+                    <Route path="posts/:id/edit" element={<EditPost />} />
                 </Route>
                 <Route element={<RequireAuth allowedRoles={["ADMIN", "EDITOR"]} />}  >
                     <Route path="lounge" element={<Lounge />} />

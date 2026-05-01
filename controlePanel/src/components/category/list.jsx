@@ -1,8 +1,10 @@
 
 import { useEffect } from 'react';
-import useFetchItems from '../../hooks/fetchItems';
+import useFetchItems from '../../hooks/useFetchItems';
 import { useNavigate, useLocation } from 'react-router';    
-
+import {faEdit} from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from 'react-router';
 
 
 const Categories = () => {
@@ -29,7 +31,12 @@ const Categories = () => {
             {categories.length > 0 ? (
                 <ul>
                     {categories.map((category, i) => (
-                        <li key={i}><strong>{category.name}</strong></li>
+                        <li key={i}>
+                            <strong>{category.name}</strong>
+                            <Link to={`/categories/${category.id}/edit`}>
+                                <FontAwesomeIcon icon={faEdit} />
+                            </Link>
+                        </li>
                     ))}
                 </ul>
             ) : (
