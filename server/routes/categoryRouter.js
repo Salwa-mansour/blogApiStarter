@@ -7,5 +7,7 @@ const verifyRoles = require('../middleware/verifyRoles');
 
 categoryRouter.get('/', categoryController.getCategories);
 categoryRouter.post('/create', auth, verifyRoles(ROLES_LIST.ADMIN, ROLES_LIST.EDITOR), categoryController.createCategory);
+categoryRouter.get('/:id',  categoryController.getCateogry);
+categoryRouter.put('/:id', auth, verifyRoles(ROLES_LIST.ADMIN, ROLES_LIST.EDITOR), categoryController.updateCategory);
 
 module.exports = categoryRouter;

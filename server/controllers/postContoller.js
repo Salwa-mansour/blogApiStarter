@@ -19,26 +19,20 @@ exports.postData = catchAsyncError(async (req, res, next) => {
             message:"post not found"
         });
     }
-    return res.status(200).json({
-        message:"post data",
-        post
-    });
+    return res.status(200).json(post);
 });
 exports.createPost = catchAsyncError(async (req, res, next) => {
+    console.log(req.body)
     const newPost = {
         title: req.body.title,
         content: req.body.content,
         isPublished: req.body.isPublished,
-        userId: req.user.id,
+        userId: req.user.userId,
         categoryId: parseInt(req.body.categoryId)
     };
 
     const post = await db.createPost(newPost);
-    return res.status(201).json({
-        message:"post created !",
-        post
-        
-    });
+    return res.status(201).json(post);
 });
 
 exports.getPosts = catchAsyncError(async (req, res, next) => {
@@ -53,12 +47,17 @@ exports.getPosts = catchAsyncError(async (req, res, next) => {
 
 exports.updatePost = catchAsyncError(async (req, res, next) => {    
     const postId = parseInt(req.params.id);
-    const newData = req.body;
+    const { title, content, isPublished, categoryId } = req.body;
+    // console.log("Updating post with ID:", postId, "New data:", newData);
+    const newData = {
+        title,
+        content,
+        isPublished: Boolean(isPublished),
+        categoryId: Number(categoryId)
+    };
     const newPost = await db.postUpdate(postId,newData);
-    return res.status(201).json({
-        message:"post Updated",
-        post:newPost
-    })
+  //  console.log(newPost)
+    return res.status(201).json(newPost )
 }
 );
 exports.deletePost = catchAsyncError(async (req, res, next) => {

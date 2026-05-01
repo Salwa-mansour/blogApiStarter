@@ -7,7 +7,12 @@ async function createCategory({ categoryName,categoryDesc }) {
    data: { name:categoryName, description:categoryDesc},
  });
 }
-
+async function getCategoryById(categoryId) {
+    const category = await prisma.category.findUnique({
+        where: { id: categoryId }
+    });
+    return category;
+}
 async function getAllCategories() {
   const categories = await prisma.category.findMany();
  
@@ -16,8 +21,20 @@ async function getAllCategories() {
   }
     return categories;
 }
-
+async function updateCategory(categoryId, newData) {
+    const category = await prisma.category.findUnique({ where: { id: categoryId } });
+    if (!category) {
+        return null; // Category not found
+    }
+    const updatedCategory = await prisma.category.update({
+        where: { id: categoryId },
+        data: newData
+    });
+    return updatedCategory;
+}
 module.exports = {
     createCategory,
-    getAllCategories
+    getAllCategories,
+    updateCategory,
+    getCategoryById
 }

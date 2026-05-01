@@ -24,13 +24,18 @@ async function getPostById(id) {
   });
   
 }
-async function postUpdate(id,newData) {
-  return prisma.post.update({
-    where:{
-      id:id
-    },
-    data:newData
-  });
+async function postUpdate(id, newData) {
+ 
+  try {
+    return await prisma.post.update({
+      where: { id: Number(id) },
+      data: newData
+    });
+  } catch (error) {
+    console.error("Prisma Error Code:", error.code); // Look for P2025
+    console.error("Prisma Error Message:", error.message);
+    throw error; // Let the controller handle the response
+  }
 }
 async function postDelete(id) {
   return prisma.post.delete({

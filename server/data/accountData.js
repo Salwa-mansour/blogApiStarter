@@ -33,28 +33,54 @@ async function findUserById(id) {
   return prisma.user.findUnique({ where: { id: Number(id) } });
 }
 async function rotateToken(oldJti, userId) {
-    try {
-        // We use a transaction so if one fails, the whole thing cancels
-        const [deleted, created] = await prisma.$transaction([
-            // Delete the old used token
-            prisma.refreshToken.delete({
-                where: { id: oldJti }
-            }),
-            // Create the next valid token
-            prisma.refreshToken.create({
-                data: {
-                    userId: userId,
-                    expiresAt: new Date(Date.now() +  24 * 60 * 60 * 1000)
-                }
-            })
-        ]);
-        
-        return created; // This contains the new 'id'
-    } catch (error) {
-        // If deletion fails, it means the jti was already used (Security risk!)
-        console.error("Token rotation failed - possible replay attack");
-        return null;
+  if (!oldJti) return null;
+
+  try {
+    // Interactive transaction (allows logic inside the transaction)
+    const newToken = await prisma.$transaction(async (tx) => {
+      
+      // 1. Check if the token exists
+      const existingToken = await tx.refreshToken.findUnique({
+        where: { id: oldJti },
+      });
+
+      // 2. If it's missing, it's a reuse/replay attack
+      if (!existingToken) {
+        // We "throw" to roll back the transaction and trigger the catch block
+        throw new Error("REUSE_DETECTED");
+      }
+
+      // 3. Delete the used token
+      await tx.refreshToken.delete({
+        where: { id: oldJti },
+      });
+
+      // 4. Create the new one
+      return await tx.refreshToken.create({
+        data: {
+          userId: userId,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      });
+    });
+
+    return newToken;
+
+  } catch (error) {
+    if (error.message === "REUSE_DETECTED") {
+      console.warn(`[SECURITY] Token reuse detected for user ${userId}. JTI: ${oldJti}`);
+      // This is where you'd optionally delete all user tokens
+    } else {
+      // Catch specific Prisma error P2025 (Record to delete not found) 
+      // in case of a race condition between findUnique and delete
+      if (error.code === 'P2025') {
+          console.warn("Race condition: Token was deleted by another request.");
+      } else {
+          console.error("Rotation Database Error:", error);
+      }
     }
+    return null; // Controller sees null and returns 403, NO MORE 500!
+  }
 }
 async function  findToken(jti) {
   return await prisma.refreshToken.findUnique({ where: { id: jti } });

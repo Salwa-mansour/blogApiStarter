@@ -114,6 +114,7 @@ exports.refreshToken = async (req, res) => {
         const newTokenRecord = await db.rotateToken(decoded.jti, decoded.userId);
 
         if (!newTokenRecord) {
+          res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'None', secure: true }); // Clear the bad cookie
             return res.status(403).json({ message: "Invalid session" });
         }
 

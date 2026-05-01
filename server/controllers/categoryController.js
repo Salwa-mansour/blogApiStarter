@@ -24,3 +24,27 @@ exports.getCategories = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json(categories);
 });
+exports.getCateogry = catchAsyncError(async (req, res, next) => {
+    const categoryId = parseInt(req.params.id);
+    const category = await db.getCategoryById(categoryId);  
+    if (!category) {
+        const error = new Error("Category not found");
+        error.statusCode = 404;
+        return next(error);
+    }
+    res.status(200).json(category);
+});
+exports.updateCategory = catchAsyncError(async (req, res, next) => {
+    const categoryId = parseInt(req.params.id);
+    const newData = req.body;
+
+    const updatedCategory = await db.updateCategory(categoryId, newData);
+
+    if (!updatedCategory) {
+        const error = new Error("Category not found");
+        error.statusCode = 404;
+        return next(error);
+    }
+
+    res.status(200).json(updatedCategory);
+});
