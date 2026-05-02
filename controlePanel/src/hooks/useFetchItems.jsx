@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useAxiosPrivate from "./useAxiosPrivate";
 
 const useFetchItems = (reqData) => {
@@ -7,39 +7,31 @@ const useFetchItems = (reqData) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        // Create a controller to cancel the request if the component unmounts
-        const controller = new AbortController();
-
-        const fetchItems = async () => {
-            setLoading(true); // Reset loading state when reqData changes
-            try {
-                const response = await axiosPrivate.get(reqData, {
-                    signal: controller.signal,
-                 
-                });
-                setItems(response.data);
-                setError(null); // Clear previous errors on success
-            } catch (error) {
-                if (error.name === 'CanceledError') {
-                    console.log(error.message);
-                    console.log('Request canceled');
-                } else {
-                    setError(error.message);
-                }
-            } finally {
-                setLoading(false);
+    // Use useCallback so the function identity doesn't change on every render
+    const fetchItems = useCallback(async (signal) => {
+        setLoading(true);
+        try {
+            const response = await axiosPrivate.get(reqData, { signal });
+            setItems(response.data);
+            setError(null);
+        } catch (error) {
+            if (error.name !== 'CanceledError' && error.name !== 'AbortError') {
+                setError(error.message);
             }
-        };
+        } finally {
+            setLoading(false);
+        }
+    }, [reqData, axiosPrivate]);
 
-        if (reqData) fetchItems();
+    useEffect(() => {
+        const controller = new AbortController();
+        if (reqData) fetchItems(controller.signal);
 
-        // Cleanup function
         return () => controller.abort();
+    }, [fetchItems]); // Runs when fetchItems (and thus reqData) changes
 
-    }, []); // Now it re-fetches if the URL changes
-
-    return [ items, loading, error ];
+    // Return the function so components can call it manually
+    return [items, loading, error, fetchItems]; 
 }
 
 export default useFetchItems;

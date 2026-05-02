@@ -7,14 +7,11 @@ import useDeleteItem from "../../hooks/useDeleteItem";
 
 
 const Posts = () => {
-    const [posts, loading, error] = useFetchItems("/posts");
+    const [posts, loading, error,refetch] = useFetchItems("/posts");
     const navigate = useNavigate();
     const location = useLocation();
-  //  const deletePost = useDeleteItem('/posts');
-    const deletePost = useDeleteItem('/posts', (deletedId) => {
-        // This removes the item from the UI immediately!
-        setItems(prev => prev.filter(item => item.id !== deletedId));
-    });
+    const deletePost = useDeleteItem('/posts',refetch);
+ 
     useEffect(() => {
         if (error) {
             console.error("Error fetching posts:", error);
@@ -29,7 +26,9 @@ const Posts = () => {
     return (
         <section>
             <h2>Posts List</h2>
+               <Link to="/createpost">new post</Link>
             {posts.length > 0 ? (
+              
                 <ul>
                     {posts.map((post, i) => (
                         <li key={i}>
